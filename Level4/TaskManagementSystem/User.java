@@ -5,7 +5,7 @@ import java.util.HashSet;
 public class User {
     private String name;
     private String id;
-    HashSet<Task> assignedTasks = new HashSet<>();
+    private HashSet<Task> assignedTasks = new HashSet<>();
 
     public User(String name, String id) {
         this.name = name;

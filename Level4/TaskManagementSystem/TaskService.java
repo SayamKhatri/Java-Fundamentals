@@ -2,12 +2,9 @@ package Level4.TaskManagementSystem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public class TaskService {
     private HashMap<StatusType, HashSet<Task>> tasks = new HashMap<>();
-    private HashMap<String, HashSet<String>> assignedTasks = new HashMap<>();
-
     private static TaskService instance = new TaskService();
     private TaskService(){};
 
@@ -47,29 +44,18 @@ public class TaskService {
 
     public void assignTask(User u, Task t){
         HashSet<Task> tasks = u.getAssignedTasks();
-        if (tasks.size() > 5){
+        if (tasks.size() >= 5){
             System.out.println("User already have 5 tasks assigned, please find another developer");
             return;
         }
 
         u.addTask(t);
-        String userName = u.getName();
-
-        if (!assignedTasks.containsKey(userName)){
-            assignedTasks.put(userName, new HashSet<>());
-        }
-
-        assignedTasks.get(userName).add(t.getTaskId());
-
     }
 
     public void completeTask(Task t, User u){
         StatusType current_status = t.getStatus();
         t.setStatus(StatusType.DONE);
         u.removeTask(t);
-        HashSet<String> assignedtaskSet = assignedTasks.get(u.getName());
-        assignedtaskSet.remove(t.getTaskId());
-        
         HashSet<Task> taskSet = tasks.get(current_status);
         taskSet.remove(t);
         
@@ -79,20 +65,19 @@ public class TaskService {
         tasks.get(StatusType.DONE).add(t);
     }
 
-    public void getTaskSummary(){
-        System.out.println("-----Generating Task Summary------");
+    public void getTaskSummary() {
+        printStatus(StatusType.IN_PROGRESS);
+        printStatus(StatusType.TODO);
+        printStatus(StatusType.DONE);
+    }
 
-        for (Map.Entry<StatusType, HashSet<Task>> entry : tasks.entrySet()) {
-            StatusType status = entry.getKey();
-            HashSet<Task> tasks = entry.getValue();
-
-            System.out.print(status + " -> ");
-            for (Task task : tasks) {
-                System.out.print(task.getTaskId());
-                System.out.print(" , ");
-            }
-            System.out.println();
+    private void printStatus(StatusType status) {
+        HashSet<Task> taskSet = tasks.getOrDefault(status, new HashSet<>());
+        System.out.print(status + " -> ");
+        for (Task task : taskSet) {
+            System.out.print(task.getTaskId() + " , ");
         }
+        System.out.println();
     }
     
     public void getTaskSummary(User u){
